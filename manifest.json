@@ -1,0 +1,9 @@
+{
+  "name": "Mes Enveloppes",
+  "short_name": "Enveloppes",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "description": "Mon application de gestion de budget par enveloppes"
+}

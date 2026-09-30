@@ -1,13 +1,6 @@
 <!doctype html><html lang="fr"><head><link rel="manifest" href="manifest.json"
                                       <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Mes Enveloppes V4</title>
 <style>
-  <script>
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker.register("./sw.js");
-    });
-  }
-</script>
 body{font-family:system-ui;margin:0;background:#fff7fb;color:#342c35}.wrap{max-width:850px;margin:auto;padding:16px}.card{background:white;border:1px solid #eadde5;border-radius:16px;padding:15px;margin:12px 0}h1{margin:0}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}.stat{padding:12px;background:#fff8fc;border:1px solid #eadde5;border-radius:12px}.stat b{display:block;font-size:20px}input,select,button{font:inherit}input,select{width:100%;padding:9px;box-sizing:border-box;border:1px solid #d8ccd4;border-radius:9px}button{border:0;border-radius:9px;padding:9px 12px;background:#c85b8c;color:#fff;font-weight:600}.danger{background:#f1d7dc;color:#8d303d}.secondary{background:#eee5eb;color:#342c35}.row{display:flex;gap:8px;align-items:center;margin:7px 0}.row>*{flex:1}.cat{border:1px solid #eadde5;border-radius:12px;padding:10px;margin:8px 0}.line{display:grid;grid-template-columns:1fr 120px auto;gap:7px;margin:6px 0}.envs{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px}.env{border:1px solid #eadde5;border-radius:12px;padding:11px}.big{font-size:21px;font-weight:700}.muted{color:#786d76;font-size:13px}.item{padding:8px 0;border-bottom:1px solid #eee5eb;display:flex;gap:8px;align-items:center}.item span:first-child{flex:1}.pill{background:#f3e6ee;border-radius:99px;padding:3px 7px;font-size:12px}.bar{height:12px;background:#eee3e9;border-radius:99px;overflow:hidden;margin-top:10px}.bar>i{display:block;height:100%;background:#c85b8c;width:0}.section{display:flex;justify-content:space-between;align-items:center}canvas{max-width:100%}
 </style></head><body><div class="wrap">
 <h1>💰 Mes Enveloppes V4</h1><p class="muted">Salaire, revenus supplémentaires, charges détaillées et enveloppes par mois.</p>
@@ -52,4 +45,14 @@ function render(){
 function chart(x){let c=$("chart"),q=c.getContext("2d");q.clearRect(0,0,c.width,c.height);let a=ENV.map(e=>[e[0],x.expenses.filter(z=>z.category===e[0]).reduce((s,z)=>s+ +z.amount,0)]).filter(e=>e[1]);if(!a.length){q.font="16px system-ui";q.fillText("Ajoute une dépense pour voir le graphique.",20,40);return}let m=Math.max(...a.map(e=>e[1])),g=(c.width-70)/a.length;a.forEach((e,i)=>{let w=Math.min(80,g-8),h=210*e[1]/m,xx=35+i*g+(g-w)/2,yy=235-h;q.fillRect(xx,yy,w,h);q.font="12px system-ui";q.fillText(Math.round(e[1])+"€",xx,yy-5);q.save();q.translate(xx+w/2,270);q.rotate(-.35);q.textAlign="center";q.fillText(e[0].replace(/^\S+ /,""),0,0);q.restore()})}
 month.addEventListener("change",render);$("salary").addEventListener("change",()=>{d().salary=Math.max(0,+$("salary").value||0);save()});
 let n=new Date();month.value=n.getFullYear()+"-"+String(n.getMonth()+1).padStart(2,"0");render();
-</script></body></html>
+</script>
+
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./sw.js");
+    });
+  }
+</script>
+  
+</body></html>

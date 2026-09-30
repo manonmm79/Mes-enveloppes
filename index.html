@@ -1,6 +1,13 @@
 <!doctype html><html lang="fr"><head><link rel="manifest" href="manifest.json"
                                       <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Mes Enveloppes V4</title>
 <style>
+  <script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./sw.js");
+    });
+  }
+</script>
 body{font-family:system-ui;margin:0;background:#fff7fb;color:#342c35}.wrap{max-width:850px;margin:auto;padding:16px}.card{background:white;border:1px solid #eadde5;border-radius:16px;padding:15px;margin:12px 0}h1{margin:0}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}.stat{padding:12px;background:#fff8fc;border:1px solid #eadde5;border-radius:12px}.stat b{display:block;font-size:20px}input,select,button{font:inherit}input,select{width:100%;padding:9px;box-sizing:border-box;border:1px solid #d8ccd4;border-radius:9px}button{border:0;border-radius:9px;padding:9px 12px;background:#c85b8c;color:#fff;font-weight:600}.danger{background:#f1d7dc;color:#8d303d}.secondary{background:#eee5eb;color:#342c35}.row{display:flex;gap:8px;align-items:center;margin:7px 0}.row>*{flex:1}.cat{border:1px solid #eadde5;border-radius:12px;padding:10px;margin:8px 0}.line{display:grid;grid-template-columns:1fr 120px auto;gap:7px;margin:6px 0}.envs{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px}.env{border:1px solid #eadde5;border-radius:12px;padding:11px}.big{font-size:21px;font-weight:700}.muted{color:#786d76;font-size:13px}.item{padding:8px 0;border-bottom:1px solid #eee5eb;display:flex;gap:8px;align-items:center}.item span:first-child{flex:1}.pill{background:#f3e6ee;border-radius:99px;padding:3px 7px;font-size:12px}.bar{height:12px;background:#eee3e9;border-radius:99px;overflow:hidden;margin-top:10px}.bar>i{display:block;height:100%;background:#c85b8c;width:0}.section{display:flex;justify-content:space-between;align-items:center}canvas{max-width:100%}
 </style></head><body><div class="wrap">
 <h1>💰 Mes Enveloppes V4</h1><p class="muted">Salaire, revenus supplémentaires, charges détaillées et enveloppes par mois.</p>

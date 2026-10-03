@@ -1,0 +1,53 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Mes Enveloppes V5</title>
+<style>
+:root{--bg:#fff7fb;--text:#342c35;--card:#fff;--border:#eadde5;--input-border:#d8ccd4;--input-bg:#fff;--muted:#786d76;--danger-bg:#f1d7dc;--danger-text:#8d303d;--secondary-bg:#eee5eb;--pill-bg:#f3e6ee;--bar-bg:#eee3e9;--theme-bg:#342c35;--theme-text:#fff}
+body.dark{--bg:#171419;--text:#f7edf3;--card:#241f23;--border:#43383f;--input-border:#5b4c55;--input-bg:#1d191c;--muted:#b8aab2;--danger-bg:#4a2c33;--danger-text:#ffc5ce;--secondary-bg:#3a3237;--pill-bg:#41353c;--bar-bg:#40363c;--theme-bg:#f7edf3;--theme-text:#241f23}
+body{font-family:system-ui;margin:0;background:var(--bg);color:var(--text);transition:background .2s,color .2s}.wrap{max-width:850px;margin:auto;padding:16px}.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:15px;margin:12px 0}h1{margin:0}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}.stat{padding:12px;background:#fff8fc;border:1px solid #eadde5;border-radius:12px}.stat b{display:block;font-size:20px}input,select,button{font:inherit}input,select{width:100%;padding:9px;box-sizing:border-box;border:1px solid var(--input-border);border-radius:9px;background:var(--input-bg);color:var(--text)}button{border:0;border-radius:9px;padding:9px 12px;background:#c85b8c;color:#fff;font-weight:600}.danger{background:var(--danger-bg);color:var(--danger-text)}.secondary{background:var(--secondary-bg);color:var(--text)}.theme{background:var(--theme-bg);color:var(--theme-text);font-size:20px;padding:7px 11px}.row{display:flex;gap:8px;align-items:center;margin:7px 0}.row>*{flex:1}.cat{border:1px solid var(--border);border-radius:12px;padding:10px;margin:8px 0}.line{display:grid;grid-template-columns:1fr 120px auto;gap:7px;margin:6px 0}.envs{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px}.env{border:1px solid var(--border);border-radius:12px;padding:11px}.big{font-size:21px;font-weight:700}.muted{color:var(--muted);font-size:13px}.item{padding:8px 0;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center}.item span:first-child{flex:1}.pill{background:var(--pill-bg);border-radius:99px;padding:3px 7px;font-size:12px}.bar{height:12px;background:var(--bar-bg);border-radius:99px;overflow:hidden;margin-top:10px}.bar>i{display:block;height:100%;background:#c85b8c;width:0}.section{display:flex;justify-content:space-between;align-items:center}canvas{max-width:100%}
+</style></head><body><div class="wrap">
+<div class="section"><h1>💰 Mes Enveloppes V5</h1><button id="themeBtn" class="theme" onclick="toggleTheme()" aria-label="Changer de thème">🌙</button></div><p class="muted">Salaire, revenus supplémentaires, charges détaillées et enveloppes par mois.</p>
+<div class="card"><div class="grid"><div><label>Mois</label><input id="month" type="month"></div><div><label>Salaire (€)</label><input id="salary" type="number" min="0" step=".01"></div></div></div>
+<div class="card"><div class="stats"><div class="stat">💶 Disponible<b id="avail"></b></div><div class="stat">💸 Dépensé<b id="spent"></b></div><div class="stat">💚 Reste<b id="left"></b></div><div class="stat">📊 Utilisé<b id="pct"></b></div></div><div class="bar"><i id="bar"></i></div></div>
+<div class="card"><h2>💶 Revenus supplémentaires</h2><div id="incomes"></div><div class="row"><input id="ia" type="number" min="0" step=".01" placeholder="Montant (€)"><input id="id" placeholder="Ex. remboursement"><button onclick="incomeAdd()">Ajouter</button></div></div>
+<div class="card"><div class="section"><h2>⚙️ Charges fixes</h2><button class="secondary" onclick="catAdd()">+ Catégorie</button></div><div id="fixed"></div></div>
+<div class="card"><h2>🧺 Enveloppes variables</h2><div class="row"><select id="ec"></select><input id="ea" type="number" min="0" step=".01" placeholder="Montant (€)"><input id="ed" placeholder="Description"><button onclick="expenseAdd()">Ajouter</button></div><div id="envs" class="envs"></div></div>
+<div class="card"><h2>📈 Dépenses variables</h2><canvas id="chart" width="760" height="300"></canvas></div>
+<div class="card"><h2>🧾 Historique</h2><div id="history"></div></div>
+</div>
+<script>
+const K="mesEnveloppesV4";
+const FIX=[["🏠 Logement + charges",[["Loyer",400],["Charges",35]]],["💡 Autres charges",[["Assurance",0],["Téléphone / internet",0],["Abonnements",0],["Autres",191]]],["💳 PEL + prêt étudiant",[["PEL + prêt étudiant",218]]]];
+const ENV=[["🛒 Courses",350],["🚗 Voiture",150],["💅 Ongles",70],["✨ Épilation",50],["🎀 Loisirs / shopping",70],["💰 Épargne de sécurité",200],["🐱 Chat",70],["🛟 Marge / imprévus",61]];
+let db=JSON.parse(localStorage.getItem(K)||"{}"), month=document.getElementById("month");
+const esc=s=>String(s??"").replace(/[&<>"']/g,x=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[x])), euro=n=>Number(n||0).toLocaleString("fr-FR",{style:"currency",currency:"EUR"});
+function fresh(){return{salary:1900,fixed:FIX.map(c=>({name:c[0],lines:c[1].map(x=>({name:x[0],amount:x[1]}))})),incomes:[],expenses:[]}}
+function d(){let k=month.value;if(!db[k])db[k]=fresh();return db[k]}
+function save(){db[month.value]=d();localStorage.setItem(K,JSON.stringify(db));render()}
+function inc(){return d().incomes.reduce((s,x)=>s+ +x.amount,0)} function ft(){return d().fixed.reduce((s,c)=>s+c.lines.reduce((a,l)=>a+ +l.amount,0),0)} function vt(){return d().expenses.reduce((s,x)=>s+ +x.amount,0)}
+function incomeAdd(){let a=+$("ia").value;if(a<=0)return alert("Indique un montant supérieur à 0 €.");d().incomes.push({amount:a,desc:$("id").value.trim()||"Revenu supplémentaire"});$("ia").value="";$("id").value="";save()}
+function incomeDel(i){d().incomes.splice(i,1);save()}
+function catAdd(){d().fixed.push({name:"Nouvelle catégorie",lines:[{name:"Nouvelle charge",amount:0}]});save()}
+function catDel(i){if(confirm("Supprimer cette catégorie ?")){d().fixed.splice(i,1);save()}}
+function lineAdd(i){d().fixed[i].lines.push({name:"Nouvelle charge",amount:0});save()}
+function lineDel(i,j){d().fixed[i].lines.splice(j,1);save()}
+function catSet(i,v){d().fixed[i].name=v;save()}
+function lineSet(i,j,f,v){d().fixed[i].lines[j][f]=f==="amount"?Math.max(0,+v||0):v;save()}
+function expenseAdd(){let a=+$("ea").value;if(a<=0)return alert("Indique un montant supérieur à 0 €.");d().expenses.push({category:$("ec").value,amount:a,desc:$("ed").value.trim()});$("ea").value="";$("ed").value="";save()}
+function expenseDel(i){d().expenses.splice(i,1);save()}
+function $(x){return document.getElementById(x)}
+const THEME_KEY="mesEnveloppesTheme";
+function applyTheme(){let dark=localStorage.getItem(THEME_KEY)==="dark";document.body.classList.toggle("dark",dark);$("themeBtn").textContent=dark?"☀️":"🌙";$("themeBtn").title=dark?"Mode clair":"Mode sombre"}
+function toggleTheme(){let dark=!document.body.classList.contains("dark");localStorage.setItem(THEME_KEY,dark?"dark":"light");applyTheme();render()}
+function render(){
+ let x=d(), available=+x.salary+inc(), spent=ft()+vt(), percent=available?Math.max(0,spent/available*100):0;
+ $("salary").value=x.salary;$("avail").textContent=euro(available);$("spent").textContent=euro(spent);$("left").textContent=euro(available-spent);$("pct").textContent=percent.toFixed(0)+" %";$("bar").style.width=Math.min(100,percent)+"%";
+ $("incomes").innerHTML=x.incomes.length?x.incomes.map((z,i)=>`<div class=item><span>💶 ${esc(z.desc)}</span><b>${euro(z.amount)}</b><button class=danger onclick="incomeDel(${i})">×</button></div>`).join(""):'<p class=muted>Aucun revenu supplémentaire ce mois-ci.</p>';
+ $("fixed").innerHTML=x.fixed.map((c,i)=>`<div class=cat><div class=row><input value="${esc(c.name)}" onchange="catSet(${i},this.value)"><button class=danger onclick="catDel(${i})">Supprimer</button></div>${c.lines.map((l,j)=>`<div class=line><input value="${esc(l.name)}" onchange="lineSet(${i},${j},'name',this.value)"><input type=number min=0 step=.01 value="${l.amount}" onchange="lineSet(${i},${j},'amount',this.value)"><button class=danger onclick="lineDel(${i},${j})">×</button></div>`).join("")}<button class=secondary onclick="lineAdd(${i})">+ Charge</button></div>`).join("");
+ $("ec").innerHTML=ENV.map(e=>`<option>${esc(e[0])}</option>`).join("");
+ $("envs").innerHTML=ENV.map(e=>{let s=x.expenses.filter(z=>z.category===e[0]).reduce((a,z)=>a+ +z.amount,0);return`<div class=env><b>${esc(e[0])}</b><div class=big>${euro(e[1]-s)}</div><span class=muted>Budget ${euro(e[1])} · Dépensé ${euro(s)}</span></div>`}).join("");
+ $("history").innerHTML=x.expenses.length?x.expenses.map((z,i)=>`<div class=item><span>${esc(z.category)} — ${esc(z.desc||"Dépense")}</span><b>${euro(z.amount)}</b><button class=danger onclick="expenseDel(${i})">×</button></div>`).join(""):'<p class=muted>Aucune dépense variable ce mois-ci.</p>'; chart(x)
+}
+function chart(x){let c=$("chart"),q=c.getContext("2d");q.clearRect(0,0,c.width,c.height);q.fillStyle=getComputedStyle(document.body).getPropertyValue("--text").trim();let a=ENV.map(e=>[e[0],x.expenses.filter(z=>z.category===e[0]).reduce((s,z)=>s+ +z.amount,0)]).filter(e=>e[1]);if(!a.length){q.font="16px system-ui";q.fillText("Ajoute une dépense pour voir le graphique.",20,40);return}let m=Math.max(...a.map(e=>e[1])),g=(c.width-70)/a.length;a.forEach((e,i)=>{let w=Math.min(80,g-8),h=210*e[1]/m,xx=35+i*g+(g-w)/2,yy=235-h;q.fillRect(xx,yy,w,h);q.font="12px system-ui";q.fillText(Math.round(e[1])+"€",xx,yy-5);q.save();q.translate(xx+w/2,270);q.rotate(-.35);q.textAlign="center";q.fillText(e[0].replace(/^\S+ /,""),0,0);q.restore()})}
+month.addEventListener("change",render);$("salary").addEventListener("change",()=>{d().salary=Math.max(0,+$("salary").value||0);save()});
+applyTheme();
+let n=new Date();month.value=n.getFullYear()+"-"+String(n.getMonth()+1).padStart(2,"0");render();
+</script></body></html>
